@@ -10,15 +10,17 @@
 #endif
 
 #include <boost/function.hpp>
-#include <forward_list>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/weak_ptr.hpp>
 #include <boost/next_prior.hpp>
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_trailing.hpp>
+#include <boost/smart_ptr/make_shared.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
+
+#include <forward_list>
+#include <stdexcept>
 
 
 class SsigError: public std::logic_error
