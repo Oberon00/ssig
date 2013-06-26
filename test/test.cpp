@@ -228,6 +228,63 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_illegal_un)
     BOOST_CHECK_THROW(s(std::logic_error("")), SsigError);
 }
 
+static bool disconnect_arg(ConnectionBase* c)
+{
+    c->disconnect();
+    return false;
+}
+
+static bool nop(ConnectionBase*)
+{
+    return true;
+}
+
+
+BOOST_AUTO_TEST_CASE(disconnect_while_called)
+{
+    Signal<bool(ConnectionBase*)> s;
+    {
+        auto c = s.connect(&disconnect_arg);
+        s(&c);
+        BOOST_CHECK(!c.isConnected());
+        BOOST_CHECK(s.empty());
+    }
+    {
+        ScopedConnection<bool(ConnectionBase*)> c1 = s.connect(&nop);
+        auto c = s.connect(&disconnect_arg);
+        ScopedConnection<bool(ConnectionBase*)> c2 = s.connect(&nop);
+        s(&c);
+        BOOST_CHECK(!c.isConnected());
+    }
+    BOOST_CHECK(s.empty());
+}
+
+BOOST_AUTO_TEST_CASE(disconnect_next_called)
+{
+    Signal<bool(ConnectionBase*)> s;
+    {
+        auto c = s.connect(&nop);
+        ScopedConnection<bool(ConnectionBase*)> c1 = s.connect(&disconnect_arg);
+        BOOST_CHECK_EQUAL(s(&c), false);
+        BOOST_CHECK(!c.isConnected());
+    }
+    BOOST_CHECK(s.empty());
+}
+
+static void checkList(std::forward_list<int> l)
+{
+    BOOST_CHECK(!l.empty());
+}
+
+BOOST_AUTO_TEST_CASE(move_vulnerability)
+{
+    Signal<void(std::forward_list<int>)> s;
+    s.connect(&checkList);
+    s.connect(&checkList);
+    std::forward_list<int> l(1);
+    s(l);
+}
+
 BOOST_AUTO_TEST_CASE(connection_un)
 {
     {
@@ -382,51 +439,6 @@ BOOST_AUTO_TEST_CASE(scoped_connection_bin)
         c.disconnect();
         BOOST_CHECK(s.empty());
     }
-}
-
-
-static bool disconnect_arg(ConnectionBase* c)
-{
-    c->disconnect();
-    return bool();
-}
-
-static bool nop(ConnectionBase*)
-{
-    return bool();
-}
-
-
-BOOST_AUTO_TEST_CASE(disconnect_while_called)
-{
-    Signal<bool(ConnectionBase*)> s;
-    {
-        auto c = s.connect(&disconnect_arg);
-        s(&c);
-        BOOST_CHECK(!c.isConnected());
-        BOOST_CHECK(s.empty());
-    }
-    {
-        ScopedConnection<bool(ConnectionBase*)> c1 = s.connect(&nop);
-        auto c = s.connect(&disconnect_arg);
-        ScopedConnection<bool(ConnectionBase*)> c2 = s.connect(&nop);
-        s(&c);
-        BOOST_CHECK(!c.isConnected());
-    }
-    BOOST_CHECK(s.empty());
-}
-
-BOOST_AUTO_TEST_CASE(disconnect_next_called)
-{
-    Signal<bool(ConnectionBase*)> s;
-    {
-        ScopedConnection<bool(ConnectionBase*)> c1 = s.connect(&disconnect_arg);
-        auto c = s.connect(&nop);
-        BOOST_CHECK(true);
-        BOOST_CHECK_EQUAL(s(&c), bool());
-        BOOST_CHECK(!c.isConnected());
-    }
-    BOOST_CHECK(s.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

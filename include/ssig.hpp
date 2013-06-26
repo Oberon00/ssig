@@ -30,15 +30,8 @@ public:
 
 namespace detail {
 
-template<typename R>
-inline R default_result()
-{
-    throw SsigError("attempt to invoke empty signal with non-void return type");
-}
-
-template<>
-inline void default_result<void>()
-{ }
+template <typename Signature>
+struct SignalInvoker;
 
 struct Calling {
     Calling(bool& b): b(b)
@@ -79,14 +72,17 @@ class ScopedConnection;
 #include BOOST_PP_ITERATE()
 
 #undef NARGS
+
 #undef TYPES
+#undef TMPL_PARAMS
 #undef TRAILING_TMPL_PARAMS
+
 #undef PRINT_TYPED_ARG
 #undef TYPED_ARGS
-#undef PRINT_TYPED_ARG_RREF
-#undef TRAILING_TYPED_ARGS_RREF
-#undef PRINT_FORWARD_ARG
+#undef TRAILING_TYPED_ARGS
 #undef ARGS
+#undef PRINT_FORWARD_ARG
+#undef TRAILING_FWD_ARGS
 
 #define SSIG_DEFINE_MEMBERSIGNAL(name, signature) \
     public:                                                               \
