@@ -8,16 +8,20 @@
 
 #define NARGS BOOST_PP_ITERATION()
 
-#define TYPES BOOST_PP_ENUM_PARAMS(NARGS, A)
-#define TMPL_PARAMS BOOST_PP_ENUM_PARAMS(NARGS, typename A)
+#define TYPES                BOOST_PP_ENUM_PARAMS(NARGS, A)
+#define TMPL_PARAMS          BOOST_PP_ENUM_PARAMS(NARGS, typename A)
 #define TRAILING_TMPL_PARAMS BOOST_PP_ENUM_TRAILING_PARAMS(NARGS, typename A)
 
-#define PRINT_TYPED_ARG(z, n, _) BOOST_PP_CAT(A, n) BOOST_PP_CAT(arg, n)
-#define TYPED_ARGS BOOST_PP_ENUM(NARGS, PRINT_TYPED_ARG, BOOST_PP_EMPTY())
-#define TRAILING_TYPED_ARGS BOOST_PP_ENUM_TRAILING(NARGS, PRINT_TYPED_ARG, BOOST_PP_EMPTY())
-#define ARGS BOOST_PP_ENUM_PARAMS(NARGS, arg)
-#define PRINT_FORWARD_ARG(z, n, _) std::forward<BOOST_PP_CAT(A, n)>(BOOST_PP_CAT(arg, n))
-#define TRAILING_FWD_ARGS BOOST_PP_ENUM_TRAILING(NARGS, PRINT_FORWARD_ARG, BOOST_PP_EMPTY())
+#define TYPED_ARGS          BOOST_PP_ENUM_BINARY_PARAMS(NARGS, A, arg)
+#define TRAILING_TYPED_ARGS BOOST_PP_COMMA_IF(NARGS) TYPED_ARGS
+#define ARGS                BOOST_PP_ENUM_PARAMS(NARGS, arg)
+
+#define PRINT_RREF_ARG(z, n, _) BOOST_PP_CAT(AF, n)&& BOOST_PP_CAT(arg, n)
+#define TYPED_RREF_ARGS         BOOST_PP_ENUM(NARGS, PRINT_RREF_ARG, ~)
+#define RREF_TMPL               BOOST_PP_EXPR_IF(NARGS, \
+                                    template <BOOST_PP_ENUM_PARAMS(NARGS, typename AF)>)
+#define PRINT_FWD_ARG(z, n, _)  std::forward<BOOST_PP_CAT(AF, n)>(BOOST_PP_CAT(arg, n))
+#define TRAILING_FWD_ARGS       BOOST_PP_ENUM_TRAILING(NARGS, PRINT_FWD_ARG, ~)
 
 template<typename R TRAILING_TMPL_PARAMS>
 class Signal<R(TYPES)> {
@@ -30,7 +34,8 @@ public:
     {
     }
 
-    R const operator() (TYPED_ARGS);
+    RREF_TMPL
+    R const operator() (TYPED_RREF_ARGS);
 
 
     connection_type connect(function_type const& slot);
@@ -97,7 +102,8 @@ namespace detail {
 } // namespace detail
 
 template<typename R TRAILING_TMPL_PARAMS>
-R const Signal<R(TYPES)>::operator() (TYPED_ARGS)
+RREF_TMPL
+R const Signal<R(TYPES)>::operator() (TYPED_RREF_ARGS)
 {
     detail::Calling lock(m_calling);
     while (!m_slots.empty() && m_slots.front()->empty())

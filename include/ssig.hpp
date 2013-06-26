@@ -12,9 +12,11 @@
 #include <boost/function.hpp>
 #include <boost/next_prior.hpp>
 #include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/preprocessor/control/expr_if.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
@@ -75,16 +77,17 @@ class ScopedConnection;
 #define BOOST_PP_FILENAME_1 "ssig_template.hpp"
 #include BOOST_PP_ITERATE()
 
-#undef NARGS
-
 #undef TYPES
 #undef TMPL_PARAMS
 #undef TRAILING_TMPL_PARAMS
 
-#undef PRINT_TYPED_ARG
 #undef TYPED_ARGS
 #undef TRAILING_TYPED_ARGS
 #undef ARGS
+
+#undef PRINT_RREF_ARG
+#undef TYPED_RREF_ARGS
+#undef RREF_TMPL
 #undef PRINT_FORWARD_ARG
 #undef TRAILING_FWD_ARGS
 
