@@ -15,7 +15,7 @@ namespace {
 
 unsigned g_numFooCalls = 0;
 
-unsigned long foo()
+unsigned foo()
 {
     return ++g_numFooCalls;
 }
@@ -40,11 +40,11 @@ void checkNullaryFooConnection(Connection<R()>& c, Signal<R()>& s)
     BOOST_CHECK(!s.empty());
     BOOST_CHECK(c.isConnected());
     unsigned numFooCalls = c.invokeSlot();
-    BOOST_CHECK_EQUAL(numFooCalls, 1);
+    BOOST_CHECK_EQUAL(numFooCalls, 1u);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
     BOOST_CHECK(!lambdaCalled);
     numFooCalls = s();
-    BOOST_CHECK_EQUAL(numFooCalls, 2);
+    BOOST_CHECK_EQUAL(numFooCalls, 2u);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
     BOOST_CHECK(lambdaCalled);
     cl.disconnect();
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_void)
     BOOST_CHECK(!s.empty());
     s.connect([&test](){test /= 2;});
     s();
-    BOOST_CHECK_EQUAL(test, 2 / 2 + 4);
+    BOOST_CHECK_EQUAL(test, 2u / 2u + 4u);
 }
 
 BOOST_AUTO_TEST_CASE(connecting_and_invoking_basic)
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_basic)
     BOOST_CHECK(!s.empty());
     s.connect(&foo);
     unsigned const numFooCalls = s();
-    BOOST_CHECK_EQUAL(numFooCalls, 2);
+    BOOST_CHECK_EQUAL(numFooCalls, 2u);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
 }
 
@@ -103,38 +103,38 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_illegal)
 BOOST_AUTO_TEST_CASE(connection)
 {
     {
-        Signal<short()> s;
-        Connection<short()> c = s.connect(&foo);
-        Connection<short()> c2 = c;
-        Connection<short()> c3 = c2;
+        Signal<unsigned long()> s;
+        Connection<unsigned long()> c = s.connect(&foo);
+        Connection<unsigned long()> c2 = c;
+        Connection<unsigned long()> c3 = c2;
         c2.disconnect();
         BOOST_CHECK(!c2.isConnected());
         BOOST_CHECK(!c.isConnected());
         BOOST_CHECK(!c3.isConnected());
         BOOST_CHECK(s.empty());
-        Connection<short()> c4 = s.connect(&foo);
+        Connection<unsigned long()> c4 = s.connect(&foo);
         checkNullaryFooConnection(c4, s);
     }
 
     {
-        Signal<wchar_t()> s;
-        Connection<wchar_t()> c(s, &foo);
+        Signal<unsigned long()> s;
+        Connection<unsigned long()> c(s, &foo);
         checkNullaryFooConnection(c, s);
     }
 }
 
 BOOST_AUTO_TEST_CASE(scoped_connection)
 {
-    Signal<short()> s;
+    Signal<unsigned long()> s;
 
     {
-        ScopedConnection<short()> c = s.connect(&foo);
+        ScopedConnection<unsigned long()> c = s.connect(&foo);
         checkNullaryFooConnection(c, s);
     }
     BOOST_CHECK(s.empty());
 
     {
-        ScopedConnection<short()> c = s.connect(&foo);
+        ScopedConnection<unsigned long()> c = s.connect(&foo);
         c.disconnect();
         BOOST_CHECK(s.empty());
     }
@@ -169,11 +169,11 @@ void checkUnaryFooConnection(Connection<R(A)>& c, Signal<R(A)>& s)
     BOOST_CHECK(!s.empty());
     BOOST_CHECK(c.isConnected());
     unsigned numFooCalls = c.invokeSlot(arg) - arg;
-    BOOST_CHECK_EQUAL(numFooCalls, 1);
+    BOOST_CHECK_EQUAL(numFooCalls, 1u);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
     BOOST_CHECK(!lambdaCalled);
     numFooCalls = s(arg) - arg;
-    BOOST_CHECK_EQUAL(numFooCalls, 2);
+    BOOST_CHECK_EQUAL(numFooCalls, 2u);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
     BOOST_CHECK(lambdaCalled);
     cl.disconnect();
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_void_un)
     s.connect([&test](int arg){test /= (2 + arg);});
     static const int arg = 2;
     s(arg);
-    BOOST_CHECK_EQUAL(test, 16 / (2 + arg) + (4 + arg));
+    BOOST_CHECK_EQUAL(test, static_cast<double>(16 / (2 + arg) + (4 + arg)));
 }
 
 BOOST_AUTO_TEST_CASE(connecting_and_invoking_basic_un)
@@ -218,9 +218,9 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_basic_un)
     s.connect(&foo);
     BOOST_CHECK(!s.empty());
     s.connect(&foo);
-    static const unsigned arg = 3;
+    static const short arg = 3;
     unsigned const numFooCalls = s(arg) - arg;
-    BOOST_CHECK_EQUAL(numFooCalls, 2);
+    BOOST_CHECK_EQUAL(numFooCalls, 2u);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
 }
 
@@ -290,30 +290,30 @@ BOOST_AUTO_TEST_CASE(move_vulnerability)
 BOOST_AUTO_TEST_CASE(connection_un)
 {
     {
-        Signal<short(int)> s;
-        Connection<short(int)> c = s.connect(&foo);
+        Signal<unsigned(int)> s;
+        Connection<unsigned(int)> c = s.connect(&foo);
         checkUnaryFooConnection(c, s);
     }
 
     {
-        Signal<wchar_t(short)> s;
-        Connection<wchar_t(short)> c(s, &foo);
+        Signal<unsigned(short)> s;
+        Connection<unsigned(short)> c(s, &foo);
         checkUnaryFooConnection(c, s);
     }
 }
 
 BOOST_AUTO_TEST_CASE(scoped_connection_un)
 {
-    Signal<short(long)> s;
+    Signal<unsigned(long)> s;
 
     {
-        ScopedConnection<short(long)> c = s.connect(&foo);
+        ScopedConnection<unsigned(long)> c = s.connect(&foo);
         checkUnaryFooConnection(c, s);
     }
     BOOST_CHECK(s.empty());
 
     {
-        ScopedConnection<short(long)> c = s.connect(&foo);
+        ScopedConnection<unsigned(long)> c = s.connect(&foo);
         c.disconnect();
         BOOST_CHECK(s.empty());
     }
@@ -347,7 +347,7 @@ void checkBinaryFooConnection(Connection<R(A1, A2)>& c, Signal<R(A1, A2)>& s)
     Connection<R(A1, A2)> cl = s.connect([&lambdaCalled](A1, A2)->R{ lambdaCalled = true; return R(); });
     BOOST_CHECK(!s.empty());
     BOOST_CHECK(c.isConnected());
-    unsigned numFooCalls = c.invokeSlot(arg, arg);
+    unsigned long long numFooCalls = c.invokeSlot(arg, arg);
     BOOST_CHECK_EQUAL(numFooCalls, 1);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
     BOOST_CHECK(!lambdaCalled);
@@ -397,29 +397,29 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_basic_bin)
     s.connect(&foo);
     BOOST_CHECK(!s.empty());
     s.connect(&foo);
-    static const int arg = 3;
+    static const short arg = 3;
     unsigned const numFooCalls = s(arg, -arg) - 2 * arg;
-    BOOST_CHECK_EQUAL(numFooCalls, 2);
+    BOOST_CHECK_EQUAL(numFooCalls, 2u);
     BOOST_CHECK_EQUAL(numFooCalls, g_numFooCalls);
 }
 
 BOOST_AUTO_TEST_CASE(connecting_and_invoking_illegal_un)
 {
-    Signal<double(std::logic_error, void*)> s;
-    BOOST_CHECK_THROW(s(std::logic_error(""), nullptr), SsigError);
+    Signal<double(std::logic_error, int)> s;
+    BOOST_CHECK_THROW(s(std::logic_error(""), 0), SsigError);
 }
 
 BOOST_AUTO_TEST_CASE(connection_bin)
 {
     {
-        Signal<short(int, int)> s;
-        Connection<short(int, int)> c = s.connect(&foo);
+        Signal<unsigned long long (int, int)> s;
+        Connection<unsigned long long (int, int)> c = s.connect(&foo);
         checkBinaryFooConnection(c, s);
     }
 
     {
-        Signal<wchar_t(short, short)> s;
-        Connection<wchar_t(short, short)> c(s, &foo);
+        Signal<unsigned(short, short)> s;
+        Connection<unsigned(short, short)> c(s, &foo);
         checkBinaryFooConnection(c, s);
     }
 }
@@ -428,16 +428,16 @@ BOOST_AUTO_TEST_CASE(scoped_connection_bin)
 {
     struct Foo { int f(bool){return int();} };
     typedef int (Foo::*fn)(bool);
-    Signal<short(long, long)> s;
+    Signal<unsigned(long, long)> s;
 
     {
-        ScopedConnection<short(long, long)> c = s.connect(&foo);
+        ScopedConnection<unsigned(long, long)> c = s.connect(&foo);
         checkBinaryFooConnection(c, s);
     }
     BOOST_CHECK(s.empty());
 
     {
-        ScopedConnection<short(long, long)> c = s.connect(&foo);
+        ScopedConnection<unsigned(long, long)> c = s.connect(&foo);
         c.disconnect();
         BOOST_CHECK(s.empty());
     }
