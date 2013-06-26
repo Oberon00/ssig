@@ -7,6 +7,8 @@
 #define BOOST_TEST_MODULE SsigTest
 #include <boost/test/unit_test.hpp>
 
+using namespace ssig; // Don't do this at home.
+
 BOOST_AUTO_TEST_SUITE(nullary_signals)
 
 namespace {

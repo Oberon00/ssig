@@ -33,8 +33,9 @@ compiler's include path or by simply copying them to the referencing project).
 Usage
 -----
 
-All functionality is provided through the [`<ssig.hpp>`][mainheader] header.
-The `ssig_template.hpp` header must not be included by user code.
+All functionality is provided through the [`<ssig.hpp>`][mainheader] header
+in `namespace ssig`. Note: The `ssig_template.hpp` header must not be included
+by user code.
 
 You may want to look into the unit test at [`test/test.cpp`][test] for usage
 examples.

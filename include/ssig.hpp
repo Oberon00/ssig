@@ -23,6 +23,8 @@
 #include <stdexcept>
 
 
+namespace ssig {
+
 class SsigError: public std::logic_error
 {
 public:
@@ -87,27 +89,28 @@ class ScopedConnection;
 #undef TRAILING_FWD_ARGS
 
 #define SSIG_DEFINE_MEMBERSIGNAL(name, signature) \
-    public:                                                               \
-        Signal<signature>::connection_type const connect_##name(          \
-            Signal<signature>::function_type const& slot)                 \
-        {                                                                 \
-            return m_sig_##name.connect(slot);                            \
-        }                                                                 \
-    private: Signal<signature> m_sig_##name;
+    public:                                                            \
+        ssig::Signal<signature>::connection_type const connect_##name( \
+            ssig::Signal<signature>::function_type const& slot)        \
+        {                                                              \
+            return m_sig_##name.connect(slot);                         \
+        }                                                              \
+    private: ssig::Signal<signature> m_sig_##name;
 
 
 #define SSIG_DEFINE_STATICSIGNAL(name, signature) \
-    public:                                                               \
-        static Signal<signature>::connection_type const connect_##name(   \
-            Signal<signature>::function_type const& slot)                 \
-        {                                                                 \
-            return sig_##name().connect(slot);                            \
-        }                                                                 \
-    private:                                                              \
-        static Signal<signature>& sig_##name()                            \
-        {                                                                 \
-            static Signal<signature> sig;                                 \
-            return sig;                                                   \
+    public:                                                                   \
+        static ssig::Signal<signature>::connection_type const connect_##name( \
+            ssig::Signal<signature>::function_type const& slot)               \
+        {                                                                     \
+            return sig_##name().connect(slot);                                \
+        }                                                                     \
+    private:                                                                  \
+        static ssig::Signal<signature>& sig_##name()                          \
+        {                                                                     \
+            static ssig::Signal<signature> sig;                               \
+            return sig;                                                       \
         }
 
+} // namespace ssig
 #endif
