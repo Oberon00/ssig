@@ -66,16 +66,18 @@ namespace detail {
         {
             if (signal.m_slots.empty())
                 throw SsigError("attempt to invoke empty signal with non-void return type");
-            for (auto it = signal.m_slots.begin(); ; ++it) {
+            for (auto it = signal.m_slots.begin(); ; ) {
                 auto r = (**it)(ARGS);
                 for (;;) {
                     auto next = boost::next(it);
-                    if (next == signal.m_slots.end())
+                    if (next == signal.m_slots.end()) {
                         return r; // return last result
-                    if ((*next)->empty())
+                    } if ((*next)->empty()) {
                         signal.m_slots.erase_after(it);
-                    else
+                    } else {
+                        it = std::move(next);
                         break;
+                    }
                 }
             }
         }
@@ -87,16 +89,18 @@ namespace detail {
         {
             if (signal.m_slots.empty())
                 return;
-            for (auto it = signal.m_slots.begin(); ; ++it) {
+            for (auto it = signal.m_slots.begin(); ; ) {
                 (**it)(ARGS);
                 for (;;) {
                     auto next = boost::next(it);
-                    if (next == signal.m_slots.end())
+                    if (next == signal.m_slots.end()) {
                         return;
-                    if ((*next)->empty())
+                    } if ((*next)->empty()) {
                         signal.m_slots.erase_after(it);
-                    else
+                    } else {
+                        it = std::move(next);
                         break;
+                    }
                 }
             }
         }
