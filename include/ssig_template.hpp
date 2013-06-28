@@ -64,7 +64,9 @@ namespace detail {
     struct SignalInvoker<R(TYPES)> {
         static R const invoke(Signal<R(TYPES)>& signal TRAILING_TYPED_ARGS)
         {
-            for (auto it = signal.m_slots.begin(); it != signal.m_slots.end(); ++it) {
+            if (signal.m_slots.empty())
+                throw SsigError("attempt to invoke empty signal with non-void return type");
+            for (auto it = signal.m_slots.begin(); ; ++it) {
                 auto r = (**it)(ARGS);
                 for (;;) {
                     auto next = boost::next(it);
@@ -76,7 +78,6 @@ namespace detail {
                         break;
                 }
             }
-            throw SsigError("attempt to invoke empty signal with non-void return type");
         }
     };
 
@@ -84,7 +85,9 @@ namespace detail {
     struct SignalInvoker<void(TYPES)> {
         static void invoke(Signal<void(TYPES)>& signal TRAILING_TYPED_ARGS)
         {
-            for (auto it = signal.m_slots.begin(); it != signal.m_slots.end(); ++it) {
+            if (signal.m_slots.empty())
+                return;
+            for (auto it = signal.m_slots.begin(); ; ++it) {
                 (**it)(ARGS);
                 for (;;) {
                     auto next = boost::next(it);
