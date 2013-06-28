@@ -147,7 +147,7 @@ This exception class is thrown by various functions of ssig.
 * `SSIG_DEFINE_MEMBERSIGNAL(name, signature)` convenience macro that must
   be used at class scope and defines a private
   `Signal<signature> m_sig_##name` member and a public `connect_##name()`
-  which is a delegate of `m_sig##name.connect()`.
+  which is a delegate of `m_sig_##name.connect()`.
 * `SSIG_DEFINE_STATICSIGNAL(name, signature)` is similar to
   `SSIG_DEFINE_MEMBERSIGNAL()` but the public connect function is static and
   the private signal is provides in the form of a static function with the
@@ -183,7 +183,7 @@ notebook (with the arguments mentioned in the output):
      8.451679s wall, 8.424054s user + 0.000000s system = 8.424054s CPU (99.7%)
     Total time (incl. preparation): 244.018221s wall, 240.615942s user + 0.093601s system = 240.709543s CPU (98.6%)
 
-What immediately catches the eye is that Boost.Signals needs over 114 seconds,
+What immediately catches the eye is that Boost.Signals needs over 112 seconds,
 being even far slower than Boost.Signals2, which is interesting since Signals
 is, contrary to Signals2 not even thread safe. In the following table, the
 total CPU times of each test are summarized, with factors normalized to ssig
