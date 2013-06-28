@@ -76,7 +76,7 @@ This class provides means to connect callable entities and call them.
 
 
 ### `class Connection<Signature>`
- 
+
     template<typename R, typename A0, typename A1, ...>
     class Connection<R(A0, A1, ...)>: public ConnectionBase
 
@@ -102,7 +102,7 @@ slot of a Signal.
 * `R invokeSlot(A0, A1, ...)` invokes the slot. Requires `isConnected()`.
 
 Any methods requiring `isConnected()` will throw a `SsigError` if this
-requirement is violated. 
+requirement is violated.
 
 #### Copy semantics
 If you copy a Connection, the slot is *not* connected again. This means
@@ -160,9 +160,9 @@ This exception class is thrown by various functions of ssig.
 
 Benchmark
 ---------
-Running the code from [`test/benchmark.cpp`][bmcode] compiled with MSVC11 in
-release mode yields the following on my Intel Core i5 430M Windows 7 x64
-notebook (with the arguments mentioned in the output):
+Running the code from [`test/benchmark.cpp`][bmcode] at commit ef32b04edd
+compiled with MSVC11 in release mode yields the following on my Intel Core i5
+430M Windows 7 x64 notebook (with the arguments mentioned in the output):
 
     Benchmark with 100000 signals and 10000 runs:
     Test 1: std::vector of function pointers
