@@ -7,7 +7,8 @@ ssig Simple Signal Library
 ssig is a library which originated from the need for a simple signal library
 which is fast enough for signals which are invoked each frame in a game.
 Sadly, [Boost.Signals][] was far too slow for this application, so I decided
-to write my own library.
+to write my own library. You may find the [results of a benchmark](#benchmark)
+at the end of this README.
 
 
 [Boost.Signals]: http://www.boost.org/libs/signals
@@ -153,7 +154,58 @@ This exception class is thrown by various functions of ssig.
   signature `Signal<signature>& sig_##name()` which contains the Signal as
   a local static variable.
 
+
 [Boost.PP.limits]: http://www.boost.org/doc/libs/release/libs/preprocessor/doc/headers/config/limits.html
+
+
+Benchmark
+---------
+Running the code from [`test/benchmark.cpp`][bmcode] compiled with MSVC11 in
+release mode yields the following on my Intel Core i5 430M Windows 7 x64
+notebook (with the arguments mentioned in the output):
+
+    Benchmark with 100000 signals and 10000 runs:
+    Test 1: std::vector of function pointers
+     2.874066s wall, 2.854818s user + 0.000000s system = 2.854818s CPU (99.3%)
+    Test 2: std::vector of std::function
+     5.484764s wall, 5.366434s user + 0.000000s system = 5.366434s CPU (97.8%)
+    Test 3: std::vector of boost::function
+     6.032948s wall, 5.928038s user + 0.000000s system = 5.928038s CPU (98.3%)
+    Test 4: Boost.Signals
+     114.299385s wall, 112.554722s user + 0.078001s system = 112.632722s CPU (98.5%)
+    Test 5: Boost.Signals2
+     77.404713s wall, 76.596491s user + 0.000000s system = 76.596491s CPU (99.0%)
+    Test 6: ssig
+     14.829950s wall, 14.508093s user + 0.000000s system = 14.508093s CPU (97.8%)
+    Test 6a: ssig+void
+     14.184894s wall, 14.008890s user + 0.000000s system = 14.008890s CPU (98.8%)
+    Test 7: virtual function calls
+     8.451679s wall, 8.424054s user + 0.000000s system = 8.424054s CPU (99.7%)
+    Total time (incl. preparation): 244.018221s wall, 240.615942s user + 0.093601s system = 240.709543s CPU (98.6%)
+
+What immediately catches the eye is that Boost.Signals needs over 114 seconds,
+being even far slower than Boost.Signals2, which is interesting since Signals
+is, contrary to Signals2 not even thread safe. In the following table, the
+total CPU times of each test are summarized, with factors normalized to ssig
+and rounded to two places after the decimal point:
+
+<table>
+    <thead><tr><td>Test</td> <td>Time (s)</td> <td>Factor</td></tr></thead>
+    <tbody>
+    <tr><td>vector of function pointers</td> <td>2.854818</td> <td>0.2</td></tr>
+    <tr><td>vector of <code>std::function</code></td> <td>5.366434</td> <td>0.37</td></tr>
+    <tr><td>vector of <code>boost::function</code></td> <td>5.928038</td> <td>0.41</td></tr>
+    <tr><td>Boost.Signals</td> <td>112.632722</td> <td>7.76</td></tr>
+    <tr><td>Boost.Signals2</td> <td>76.596491</td> <td>5.28</td></tr>
+    <tr><td>ssig</td> <td>14.508093</td> <td>1</td></tr>
+    <tr><td>ssig+void</td> <td>14.008890</td> <td>0.97</td></tr>
+    <tr><td>virtual functions</td> <td>8.424054</td> <td>0.58</td></tr>
+    </tbody>
+</table>
+
+
+
+[bmcode]: test/benchmark.cpp
 
 
 > ssig -- Copyright (c) Christian Neumüller 2012--2013
