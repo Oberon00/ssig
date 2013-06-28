@@ -100,6 +100,15 @@ BOOST_AUTO_TEST_CASE(connecting_and_invoking_illegal)
     BOOST_CHECK_THROW(s(), SsigError);
 }
 
+BOOST_AUTO_TEST_CASE(return_reference)
+{
+    double d = 1.;
+    Signal<double&()> s;
+    s.connect([&d]() -> double& { return d; });
+    s() = 2.;
+    BOOST_CHECK_EQUAL(d, 2.);
+}
+
 BOOST_AUTO_TEST_CASE(connection)
 {
     {
@@ -344,7 +353,10 @@ void checkBinaryFooConnection(Connection<R(A1, A2)>& c, Signal<R(A1, A2)>& s)
 
     bool lambdaCalled = false;
     prepare();
-    Connection<R(A1, A2)> cl = s.connect([&lambdaCalled](A1, A2)->R{ lambdaCalled = true; return R(); });
+    Connection<R(A1, A2)> cl = s.connect([&lambdaCalled](A1, A2) -> R {
+        lambdaCalled = true;
+        return R();
+    });
     BOOST_CHECK(!s.empty());
     BOOST_CHECK(c.isConnected());
     unsigned long long numFooCalls = c.invokeSlot(arg, arg);

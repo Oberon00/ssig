@@ -67,7 +67,7 @@ namespace detail {
             if (signal.m_slots.empty())
                 throw SsigError("attempt to invoke empty signal with non-void return type");
             for (auto it = signal.m_slots.begin(); ; ) {
-                auto r = (**it)(ARGS);
+                R r((**it)(ARGS));
                 for (;;) {
                     auto next = boost::next(it);
                     if (next == signal.m_slots.end()) {
