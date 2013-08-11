@@ -18,10 +18,14 @@
 
 #define PRINT_RREF_ARG(z, n, _) BOOST_PP_CAT(AF, n)&& BOOST_PP_CAT(arg, n)
 #define TYPED_RREF_ARGS         BOOST_PP_ENUM(NARGS, PRINT_RREF_ARG, ~)
-#define RREF_TMPL               BOOST_PP_EXPR_IF(NARGS, \
-                                    template <BOOST_PP_ENUM_PARAMS(NARGS, typename AF)>)
 #define PRINT_FWD_ARG(z, n, _)  std::forward<BOOST_PP_CAT(AF, n)>(BOOST_PP_CAT(arg, n))
 #define TRAILING_FWD_ARGS       BOOST_PP_ENUM_TRAILING(NARGS, PRINT_FWD_ARG, ~)
+
+#if NARGS
+#    define RREF_TMPL template <BOOST_PP_ENUM_PARAMS(NARGS, typename AF)>
+#else
+#    define RREF_TMPL
+#endif
 
 template<typename R TRAILING_TMPL_PARAMS>
 class Signal<R(TYPES)> {
@@ -127,16 +131,29 @@ public:
         "internal error: inconsistent typedef");
 
     Connection() { } // construct disconnected signal
+    
+    // For MSVC, define move & copy declarations explicitly.
     Connection(Connection&& rhs):
         m_slot(std::move(rhs.m_slot))
     {
     }
 
-     Connection& operator=(Connection&& rhs)
-     {
-        m_slot = std::move(rhs.m_slot);
-        return *this;
-     }
+    Connection& operator=(Connection&& rhs)
+    {
+       m_slot = std::move(rhs.m_slot);
+       return *this;
+    }
+    
+    Connection(Connection const& rhs):
+        m_slot(rhs.m_slot)
+    {
+    }
+
+    Connection& operator=(Connection const& rhs)
+    {
+       m_slot = rhs.m_slot;
+       return *this;
+    }
 
     Connection(signal_type& signal, typename signal_type::function_type const& slot)
     {
