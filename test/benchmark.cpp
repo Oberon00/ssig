@@ -2,13 +2,12 @@
 #include <boost/timer/timer.hpp>
 #include <functional> // std::function
 #include <boost/function.hpp>
+#define BOOST_SIGNALS_NO_DEPRECATION_WARNING
 #include <boost/signal.hpp>
 #include <boost/signals2/signal.hpp>
 #include <vector>
 #include <cstdlib>  // atol
 #include <ssig.hpp>
-
-static int dummy = 0;
 
 using std::cout;
 
@@ -82,7 +81,7 @@ int main(int argc, char* argv[])
     {
         skip_boost = atol(argv[3]) ? true : false;
     }
-    std::cout << "Benchmark with " << num_sigs << " signals and " << num_runs << " runs:\n";
+    cout << "Benchmark with " << num_sigs << " signals and " << num_runs << " runs:\n";
     boost::timer::auto_cpu_timer total;
     try
     {
@@ -141,5 +140,5 @@ int main(int argc, char* argv[])
     {
         std::cerr << e.what() << "; try decreasing number_of_signals\n";
     }
-    std::cout << "Total time (incl. preparation):"; // destruction of total timer prints space + results
+    cout << "Total time (incl. preparation):"; // destruction of total timer prints space + results
 }
